@@ -71,7 +71,7 @@ class Value:
 
     def tanh(self) -> Value:
         x = self.data
-        t = (math.exp(2 * x) - 1) / (math.exp(2 * x) + 1)
+        t = math.tanh(x)
         out = Value(t, (self,), 'tanh')
 
         def _backward():

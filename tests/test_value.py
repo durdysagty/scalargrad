@@ -22,3 +22,8 @@ def test_mul_backward():
 def test_ops_with_scalar_on_both_sides(op):
     a= Value(2.0)
     assert isinstance(op(a, 5.0), Value) and isinstance(op(5.0, a), Value)
+
+@pytest.mark.parametrize("x", [Value(-1000.0), Value(-50.0), Value(0.0), Value(50.0), Value(1000.0)])
+def test_tanh(x):
+    y = x.tanh()
+    assert -1 <= y.data <= 1, f"tanh({x.data}) = {y.data} is out of bounds"
