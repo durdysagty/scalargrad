@@ -57,11 +57,17 @@ class Value:
     def __sub__(self, other: Value | float) -> Value:
         return self + (-other)
 
+    def __rsub__(self, other: Value | float) -> Value:
+        return other + (-self)
+
     def __neg__(self) -> Value:
         return self * -1
 
     def __truediv__(self, other: Value | float) -> Value:
         return self * other**-1
+
+    def __rtruediv__(self, other: Value | float) -> Value:
+        return other * self**-1
 
     def tanh(self) -> Value:
         x = self.data
