@@ -62,3 +62,11 @@ def test_backward_on_leaf():
     leaf = Value(5.0)
     leaf.backward()
     assert leaf.grad == 1.0
+
+def test_backward_handles_deep_graph():
+    x = Value(2.0)
+    a = x
+    for _ in range(5000):          # deeper than the default recursion limit (1000)
+        a = a * 1
+    a.backward()
+    assert x.grad == 1.0
