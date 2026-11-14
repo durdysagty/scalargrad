@@ -6,7 +6,7 @@ It follows Andrej Karpathy's [micrograd](https://github.com/karpathy/micrograd) 
 
 ## What's inside
 
-- `scalargrad/value.py` — `Value`, a scalar that records the operations applied to it and computes gradients with `backward()`. Supports `+`, `-`, `*`, `/` and `**` (with plain numbers on either side), plus `tanh()` and `relu()`.
+- `scalargrad/value.py` — `Value`, a scalar that records the operations applied to it and computes gradients with `backward()`. Supports `+`, `-`, `*` and `/` (with plain numbers on either side), `**` with a plain number as the exponent, plus `tanh()` and `relu()`.
 - `scalargrad/nn.py` — `Neuron`, `Layer` and `MLP`, built from `Value`s, with a `Module` base class that provides `parameters()` and `zero_grad()`.
 - `demo.ipynb` — trains a small MLP on a toy dataset and checks the hidden layers for dead ReLU neurons.
 - `tests/` — pytest tests for `Value`.
