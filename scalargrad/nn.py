@@ -2,6 +2,7 @@ from scalargrad.value import Value
 from abc import ABC, abstractmethod
 from typing import Callable, Sequence
 import random
+import math
 
 class Module(ABC):
 
@@ -16,8 +17,8 @@ class Module(ABC):
 class Neuron(Module):
 
     def __init__(self, n_inputs: int, activation: Callable[[Value], Value] | None = Value.relu):
-        self.weights = [Value(random.uniform(-1, 1)) for _ in range(n_inputs)]
-        self.bias = Value(0)
+        self.weights = [Value(random.uniform(-0.5, 1)/math.sqrt(n_inputs)) for _ in range(n_inputs)]
+        self.bias = Value(0.4 * random.uniform(0, 1))
         self.activation = activation
 
     def __call__(self, inputs: Sequence[Value | float]) -> Value:
