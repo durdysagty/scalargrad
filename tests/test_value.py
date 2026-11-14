@@ -1,5 +1,6 @@
 from scalargrad.value import Value
 import pytest
+import torch
 
 def test_add_backward():
     a, b = Value(2.0), Value(1.0)
@@ -70,3 +71,16 @@ def test_backward_handles_deep_graph():
         a = a * 1
     a.backward()
     assert x.grad == 1.0
+
+def test_grads_match_pytorch():
+    a, b = Value(1.3), Value(-0.7)
+    out = (a * b + a**2 - b / a).tanh()
+    out.backward()
+
+    a_torch = torch.tensor(1.3, requires_grad=True)
+    b_torch = torch.tensor(-0.7, requires_grad=True)
+    out_torch = (a_torch * b_torch + a_torch**2 - b_torch / a_torch).tanh()
+    out_torch.backward()
+
+    assert a.grad == pytest.approx(a_torch.grad.item())
+    assert b.grad == pytest.approx(b_torch.grad.item())
