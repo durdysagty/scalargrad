@@ -9,7 +9,7 @@ It follows Andrej Karpathy's [micrograd](https://github.com/karpathy/micrograd) 
 - `scalargrad/value.py` — `Value`, a scalar that records the operations applied to it and computes gradients with `backward()`. Supports `+`, `-`, `*` and `/` (with plain numbers on either side), `**` with a plain number as the exponent, plus `tanh()` and `relu()`.
 - `scalargrad/nn.py` — `Neuron`, `Layer` and `MLP`, built from `Value`s, with a `Module` base class that provides `parameters()` and `zero_grad()`.
 - `demo.ipynb` — trains a small MLP on a toy dataset and checks the hidden layers for dead ReLU neurons.
-- `tests/` — pytest tests for `Value`.
+- `tests/` — pytest tests for `Value`, including a check of its gradients against PyTorch.
 
 ## Example
 
@@ -30,11 +30,11 @@ print(len(n.parameters()))   # 41
 
 ## Setup
 
-Requires Python 3.10 or newer. The library itself has no dependencies; `pytest` is only needed for the tests and `ipykernel` for the notebook.
+Requires Python 3.10 or newer. The library itself has no dependencies. The `dev` group in `pyproject.toml` lists what the tests and the notebook need: `pytest`, `ipykernel` and `torch` (the tests compare gradients with PyTorch). Installing a group needs pip 25.1 or newer.
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install pytest ipykernel
+pip install --group dev
 pytest
 ```
