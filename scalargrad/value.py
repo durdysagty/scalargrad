@@ -90,20 +90,27 @@ class Value:
         return out
 
     def backward(self):
+        """Compute d(self)/d(node) for every node in this value's graph.
+
+        Gradients accumulate into .grad; they are not reset between calls.
+        Set them to zero first (e.g. Module.zero_grad()) when you need a
+        fresh pass.
+        """
+
         topo: list[Value] = []
         visited: set[Value] = set()
-        def build_topo(v: Value):
-            if v not in visited:
+        stack: list[tuple[Value, bool]] = [(self, False)]
+        while stack:
+            v, parents_done = stack.pop()
+            if parents_done:
+                topo.append(v)                 # all its parents are already in topo
+            elif v not in visited:
                 visited.add(v)
+                stack.append((v, True))        # revisit v after its parents
                 for p in v._parents:
-                    build_topo(p)
-                topo.append(v)
-        build_topo(self)
+                    if p not in visited:
+                        stack.append((p, False))
+
         self.grad = 1.0
         for v in reversed(topo):
             v._backward()
-    
-    
-
-    
-
