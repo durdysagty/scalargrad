@@ -81,6 +81,65 @@ def test_grads_match_pytorch():
     b_torch = torch.tensor(-0.7, requires_grad=True)
     out_torch = (a_torch * b_torch + a_torch**2 - b_torch / a_torch).tanh()
     out_torch.backward()
-
+    assert a_torch.grad is not None and b_torch.grad is not None
     assert a.grad == pytest.approx(a_torch.grad.item())
     assert b.grad == pytest.approx(b_torch.grad.item())
+
+def test_relu_graph_matches_pytorch():
+    x = Value(-5.)
+    z = 2 * x + 2 + x
+    q = z.relu() + z * x
+    h = (z * z).relu()
+    y = h + q + q * x
+    y.backward()
+    xsg, ysg = x, y
+
+    x = torch.tensor([-5.], dtype=torch.float64, requires_grad=True)
+    z = 2 * x + 2 + x
+    q = z.relu() + z * x
+    h = (z * z).relu()
+    y = h + q + q * x
+    y.backward()
+    xpt, ypt = x, y
+
+    assert ysg.data == ypt.data.item()
+    assert xpt.grad is not None
+    assert xsg.grad == xpt.grad.item()
+
+def test_many_ops_match_pytorch():
+    a = Value(2.)
+    b = Value(-3.)
+    c = a + b
+    d = a * b + b**3
+    c += c + 1
+    c += 1 + c + (-a)
+    d += d * 2 + (b + a).relu()
+    d += 3 * d + (b - a).relu()
+    e = c - d
+    f = e**2
+    g = f / 2.
+    g += 10 / f
+    g.backward()
+    asg, bsg, gsg = a, b, g
+
+    a = torch.tensor([2.], dtype=torch.float64, requires_grad=True)
+    b = torch.tensor([-3.], dtype=torch.float64, requires_grad=True)
+    c = a + b
+    d = a * b + b**3
+    c += c + 1
+    c += 1 + c + (-a)
+    d += d * 2 + (b + a).relu()
+    d += 3 * d + (b - a).relu()
+    e = c - d
+    f = e**2
+    g = f / 2.
+    g += 10 / f
+    g.backward()
+    apt, bpt, gpt = a, b, g
+
+    tolerance = 1e-6
+    assert abs(gsg.data - gpt.data.item()) < tolerance
+    assert apt.grad is not None
+    assert bpt.grad is not None
+    assert abs(asg.grad - apt.grad.item()) < tolerance
+    assert abs(bsg.grad - bpt.grad.item()) < tolerance
